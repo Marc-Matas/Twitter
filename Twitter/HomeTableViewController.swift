@@ -22,7 +22,15 @@ class HomeTableViewController: UITableViewController {
         loadTweets()
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        self.tableView.rowHeight = UITableView.automaticDimension
+        self.tableView.estimatedRowHeight = 150
         
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadMoreTweets()
     }
     
     @objc func loadTweets(){
@@ -102,13 +110,24 @@ class HomeTableViewController: UITableViewController {
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
         }
+        
+        cell.setFavorited(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
+            
+        let twitterTimestamp = (tweetArray[indexPath.row]["created_at"] as? String)!
+        let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "eee MMM dd HH:mm:ss ZZZZ yyyy"
+        if let date = dateFormatter.date(from: twitterTimestamp) {
+        let df = DateFormatter()
+                df.dateStyle = .short
+                df.timeStyle = .short
+        let result = df.string(from: date)
+                cell.tweetDateLabel.text = result
+            
+        }
         return cell
     }
-    
-    
-    
-    
-    
+        
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
